@@ -16,14 +16,14 @@ class ColorGame(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Color Match Game")
-        self.geometry("450x450")
+        self.geometry("450x500")
 
         # -------------------------
         # Instruction
         # -------------------------
         self.instruction = tk.Label(
-            self, 
-            text="Click the button that matches the color name!", 
+            self,
+            text="Click the button that matches the color name!",
             font=("Arial", 14)
         )
         self.instruction.pack(pady=10)
@@ -35,9 +35,9 @@ class ColorGame(tk.Tk):
         difficulties = ["Easy", "Medium", "Hard"]
 
         self.difficulty_menu = tk.OptionMenu(
-            self, 
-            self.difficulty_var, 
-            *difficulties, 
+            self,
+            self.difficulty_var,
+            *difficulties,
             command=lambda _: self.update_buttons()
         )
         self.difficulty_menu.pack(pady=5)
@@ -57,11 +57,18 @@ class ColorGame(tk.Tk):
         self.score_label.pack()
 
         # -------------------------
-        # Start / Reset button
+        # Timer Label
+        # -------------------------
+        self.time_left = 30
+        self.timer_label = tk.Label(self, text=f"Time: {self.time_left}", font=("Arial", 14))
+        self.timer_label.pack()
+
+        # -------------------------
+        # Start / Reset Game button
         # -------------------------
         self.start_button = tk.Button(
-            self, 
-            text="Start Game", 
+            self,
+            text="Start Game",
             font=("Arial", 12),
             command=self.start_game
         )
@@ -109,67 +116,48 @@ class ColorGame(tk.Tk):
         # Create new buttons
         for name, hexcode in selected_colors:
             btn = tk.Button(
-                self.button_frame, 
-                text=name, 
-                bg=hexcode, 
+                self.button_frame,
+                text=name,
+                bg=hexcode,
                 width=10,
                 command=lambda n=name: self.check_answer(n)
             )
             btn.pack(side="left", padx=5)
 
+        # Pick a valid colour
         self.pick_new_color()
 
     # ------------------------------------------------
-    # Reset game, score, and pick new color
+    # Start or Reset the game
     # ------------------------------------------------
     def start_game(self):
-        """Reset the game, score, and choose a new colour."""
+        """Reset the game, enable buttons, restart timer, and pick new colour."""
+
+        # Reset score + labels
         self.score = 0
         self.score_label.config(text=f"Score: {self.score}")
         self.feedback.config(text="")
-        self.pick_new_color()
 
-        # Change button text from 'Start' to 'Reset' 
+        # Reactivate buttons (in case a previous timer ended)
+        for widget in self.button_frame.winfo_children():
+            widget.config(state="normal")
+
+        # Reset timer
+        self.time_left = 30
+        self.timer_label.config(text=f"Time: {self.time_left}")
+
+        # Start timer
+        self.run_timer()
+
+        # Change button text from 'Start' to 'Reset'
         self.start_button.config(text="Reset Game")
 
-    # ------------------------------------------------
-    # Pick a new valid colour
-    # ------------------------------------------------
-    def pick_new_color(self):
-        """Select a new random color depending on difficulty."""
-        difficulty = self.difficulty_var.get()
-
-        if difficulty == "Easy":
-            available = list(colors.keys())[:2]
-        elif difficulty == "Medium":
-            available = list(colors.keys())[:4]
-        else:
-            available = list(colors.keys())
-
-        self.target_color = random.choice(available)
-        self.color_label.config(text=self.target_color)
+        # New color
+        self.pick_new_color()
 
     # ------------------------------------------------
-    # Check answer + update score
+    # Timer logic
     # ------------------------------------------------
-    def check_answer(self, chosen):
-        """Check if the user selected the correct colour."""
-        if chosen == self.target_color:
-            self.feedback.config(text="✅ Correct!", fg="green")
-
-            # Increase score
-            self.score += 1
-            self.score_label.config(text=f"Score: {self.score}")
-
-            # Move to next color
-            self.pick_new_color()
-        else:
-            self.feedback.config(text="❌ Try again!", fg="red")
-
-
-# ------------------------------------------------
-# Run the game
-# ------------------------------------------------
-if __name__ == "__main__":
-    app = ColorGame()
-    app.mainloop()
+    def run_timer(self):
+        """Countdown timer that triggers game over."""
+        if self.time_left > 0:
