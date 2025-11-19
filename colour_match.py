@@ -1,3 +1,4 @@
+#I acknowledge the use of Microsoft Copilot to assist in creating this code file.
 import tkinter as tk
 import random
 
