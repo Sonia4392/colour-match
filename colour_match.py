@@ -1,4 +1,4 @@
-#I acknowledge the use of Microsoft Copilot to assist in creating this code file.
+# I acknowledge the use of Microsoft Copilot to assist in creating this code file.
 import tkinter as tk
 import random
 
@@ -19,7 +19,11 @@ class ColorGame(tk.Tk):
         self.geometry("400x300")
         
         # Instruction label
-        self.instruction = tk.Label(self, text="Click the button that matches the color name!", font=("Arial", 14))
+        self.instruction = tk.Label(
+            self, 
+            text="Click the button that matches the color name!", 
+            font=("Arial", 14)
+        )
         self.instruction.pack(pady=10)
         
         # Display random color name
@@ -33,18 +37,31 @@ class ColorGame(tk.Tk):
         
         # Create buttons for each color
         for name, hexcode in colors.items():
-            btn = tk.Button(self.button_frame, text=name, bg=hexcode, width=10, command=lambda n=name: self.check_answer(n))
+            btn = tk.Button(
+                self.button_frame, 
+                text=name, 
+                bg=hexcode, 
+                width=10,
+                command=lambda n=name: self.check_answer(n)
+            )
             btn.pack(side="left", padx=5)
         
         # Feedback label
         self.feedback = tk.Label(self, text="", font=("Arial", 14))
         self.feedback.pack(pady=10)
 
+    def pick_new_color(self):
+        """Pick and display a new random color."""
+        self.target_color = random.choice(list(colors.keys()))
+        self.color_label.config(text=self.target_color)
+
     def check_answer(self, chosen):
         if chosen == self.target_color:
             self.feedback.config(text="✅ Correct!", fg="green")
+            self.pick_new_color()  # 🔥 Move to next color automatically
         else:
             self.feedback.config(text="❌ Try again!", fg="red")
+
 
 # Run the game
 if __name__ == "__main__":
