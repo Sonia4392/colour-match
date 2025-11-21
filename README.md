@@ -20,3 +20,4 @@ To run this game, you just need Python 3 installed on your device (most laptops 
 5. Once you’re in the right folder, run:
    python color_match.py
 6. The game window will pop up and you can start playing straight away.
+*****************************This is an update to show branch merge*****************************
